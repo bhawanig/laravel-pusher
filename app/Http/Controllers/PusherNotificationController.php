@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Task;
-use Pusher\Pusher;
+use App\Events\Notify;
 class PusherNotificationController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Write code on Method
      *
@@ -25,20 +29,11 @@ class PusherNotificationController extends Controller
             'description' => $data['description'],
             'user_id' => Auth::id()
         ]);
-        $options = array(
-			'cluster' => env('PUSHER_APP_CLUSTER'),
-			'encrypted' => true
-		);
-        $pusher = new Pusher(
-			env('PUSHER_APP_KEY'),
-			env('PUSHER_APP_SECRET'),
-			env('PUSHER_APP_ID'), 
-			$options
-		);
+       
         $sendData['userName'] = Auth::user()->name;
         $sendData['description'] = $data['description'];
         $sendData['title'] = $data['title'];
-        $pusher->trigger('tasks-submit', 'App\\Events\\Notify', $sendData);
+        Notify::dispatch($sendData);
         return redirect("create")->withSuccess('Event send success.');
     }
 }

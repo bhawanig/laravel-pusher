@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class Notify
+class Notify implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -19,9 +19,10 @@ class Notify
      *
      * @return void
      */
-    public function __construct()
+    public $message;
+    public function __construct(Array $message)
     {
-        //
+        $this->message = $message;
     }
 
     /**
